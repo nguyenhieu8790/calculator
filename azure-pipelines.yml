@@ -1,3 +1,5 @@
+name: 'caculator prod CICD'
+
 trigger:
 - master
 
