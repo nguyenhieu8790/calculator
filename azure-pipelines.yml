@@ -7,7 +7,7 @@ pr: none
 
 variables: 
 #  # Service connection as configured in project settings
-  prodConnection: 'Microsoft Partner Network'
+  prodConnection: 'hieunv-webapp-connection'
 
 #  # App name
   prodApp: 'hieunv-calc'
