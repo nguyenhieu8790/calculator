@@ -3,12 +3,12 @@ trigger:
 
 pr: none
 
-variables: 
-  # Service connection as configured in project settings
-  prodConnection: 'isabelProd'
+#variables: 
+#  # Service connection as configured in project settings
+#  prodConnection: 'isabelProd'
 
-  # App name
-  prodApp: 'isabelProd'
+#  # App name
+#  prodApp: 'isabelProd'
 
 stages:
 - stage: build
