@@ -1,0 +1,66 @@
+trigger:
+  - master
+
+pr: none
+
+variables:
+  #  # Service connection as configured in project settings
+  prodConnection: 'hieunv-webapp-connection'
+  SlotName: '20210316'
+  #  # App name
+  prodApp: 'hieunv-calc'
+
+stages:
+  - stage: build
+    displayName: 'Build'
+    jobs:
+      - job: build_test
+        displayName: 'Build and test'
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '10.x'
+            displayName: 'Install Node.js'
+          - script: |
+              npm install
+              npm run build
+              npm run test
+            displayName: 'npm install, build, and test'
+          - task: ArchiveFiles@2
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+              replaceExistingArchive: true
+
+          - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+            artifact: drop
+
+  - stage: deploy_slot
+    displayName: 'deploy_slot'
+    jobs:
+      - job: deploy_slot
+        displayName: 'Build and test'
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        steps:
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Azure App Service Deploy:  new version'
+            inputs:
+                azureSubscription: 'Microsoft Partner Network (16ba3077-7489-4b0f-a4d4-82093fb7c814)'
+                appType: webAppLinux
+                WebAppName: 'hieunv-calc'
+                deployToSlotOrASE: true
+                ResourceGroupName: 'hieunv-webapp'
+                SlotName: '$(SlotName)'
+                RuntimeStack: 'NODE|10-lts'
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440 # task times out in 1 day
+            inputs:
+                notifyUsers: |
+                  hieunv3@smartosc.com
+                instructions: 'Please validate the build configuration and resume'
+                onTimeout: 'resume'
