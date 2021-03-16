@@ -41,6 +41,7 @@ stages:
               ArtifactName: 'drop'
 
   - stage: deploy_slot
+    
     displayName: 'deploy_slot'
     jobs:
       - job: deploy_slot
@@ -48,6 +49,7 @@ stages:
         pool:
           vmImage: 'Ubuntu-16.04'
         steps:
+        - checkout: none
         - task: AzureWebApp@1
           inputs:
             azureSubscription: $(prodConnection)
@@ -55,7 +57,7 @@ stages:
             appName: $(prodApp)
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
-            package: $(Build.ArtifactStagingDirectory)/**/*.zip
+            package: $(System.DefaultWorkingDirectory)/**/*.zip
             slotName: $(SlotName)
 
       - job: waitForValidation
@@ -79,6 +81,7 @@ stages:
         pool:
           vmImage: 'Ubuntu-16.04'
         steps:
+          - checkout: none
           - task: AzureAppServiceManage@0
             inputs:
               azureSubscription: $(prodConnection)
