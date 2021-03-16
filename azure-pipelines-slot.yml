@@ -1,12 +1,17 @@
-trigger:
-  - master
+trigger: none
+parameters:
+  - name: SlotName
+    type: string
+    default: 20210316
+    values:
+    - 20210316
+    - 20210317
 
 pr: none
 
 variables:
   #  # Service connection as configured in project settings
   prodConnection: 'hieunv-webapp-connection'
-  SlotName: '20210316'
   #  # App name
   prodApp: 'hieunv-calc'
 
@@ -40,7 +45,7 @@ stages:
               ArtifactName: 'drop'
 
   - stage: deploy_slot
-    
+    dependsOn: build
     displayName: 'deploy_slot'
     jobs:
       - job: deploy_slot
@@ -64,7 +69,7 @@ stages:
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
             package: $(System.ArtifactsDirectory)/**/*.zip
-            slotName: $(SlotName)
+            slotName: ${{ parameters.SlotName }}
 
       - job: waitForValidation
         dependsOn: 'deploy_slot'
@@ -79,6 +84,7 @@ stages:
               test@test.com
               example@example.com
             instructions: 'Please validate the build configuration and resume'
+            onTimeout: 'reject'
 
       - job: 'swap_to_new_slot'
         dependsOn: 'waitForValidation'
@@ -92,6 +98,6 @@ stages:
               azureSubscription: $(prodConnection)
               action: 'Swap Slots'
               webAppName: 'hieunv-calc'
-              sourceSlot: $(SlotName)
+              sourceSlot: ${{ parameters.SlotName }}
               swapWithProduction: true
               slot: 'production'
