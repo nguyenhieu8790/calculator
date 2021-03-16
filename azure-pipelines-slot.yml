@@ -37,7 +37,7 @@ stages:
               replaceExistingArchive: true
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'drop'
 
   - stage: deploy_slot
@@ -55,7 +55,7 @@ stages:
             appName: $(prodApp)
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
-            package: $(System.DefaultWorkingDirectory)/**/*.zip
+            package: $(Build.ArtifactStagingDirectory)/**/*.zip
             slotName: $(SlotName)
 
       - job: waitForValidation
