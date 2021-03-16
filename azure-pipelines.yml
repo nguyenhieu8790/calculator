@@ -53,6 +53,8 @@ stages:
           - task: DownloadPipelineArtifact@1
             inputs:
               downloadPath: '$(System.DefaultWorkingDirectory)'
+          - bash: pwd
+          - bash: 'ls -al'
           - task: AzureWebApp@1
             inputs:
               azureSubscription: $(prodConnection)
