@@ -71,7 +71,7 @@ stages:
             instructions: 'Please validate the build configuration and resume'
             onTimeout: 'resume'
 
-      - job: 'swap-to-new-slot'
+      - job: 'swap_to_new_slot'
         displayName: 'Swap to new slot'
         pool:
           vmImage: 'Ubuntu-16.04'
