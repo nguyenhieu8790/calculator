@@ -37,7 +37,6 @@ stages:
               replaceExistingArchive: true
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
               ArtifactName: 'drop'
 
   - stage: deploy_slot
@@ -50,6 +49,13 @@ stages:
           vmImage: 'Ubuntu-16.04'
         steps:
         - checkout: none
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'drop'
+            downloadPath: '$(System.ArtifactsDirectory)'
+            
         - task: AzureWebApp@1
           inputs:
             azureSubscription: $(prodConnection)
@@ -57,7 +63,7 @@ stages:
             appName: $(prodApp)
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
-            package: $(System.DefaultWorkingDirectory)/**/*.zip
+            package: $(System.ArtifactsDirectory)/**/*.zip
             slotName: $(SlotName)
 
       - job: waitForValidation
@@ -73,7 +79,6 @@ stages:
               test@test.com
               example@example.com
             instructions: 'Please validate the build configuration and resume'
-            onTimeout: 'resume'
 
       - job: 'swap_to_new_slot'
         dependsOn: 'waitForValidation'
