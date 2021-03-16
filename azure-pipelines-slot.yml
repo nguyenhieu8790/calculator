@@ -47,17 +47,18 @@ stages:
         pool:
           vmImage: 'Ubuntu-16.04'
         steps:
-          - task: AzureRmWebAppDeployment@4
-            displayName: 'Azure App Service Deploy:  new version'
-            inputs:
-                azureSubscription: 'Microsoft Partner Network (16ba3077-7489-4b0f-a4d4-82093fb7c814)'
-                appType: webAppLinux
-                WebAppName: 'hieunv-calc'
-                deployToSlotOrASE: true
-                ResourceGroupName: 'hieunv-webapp'
-                SlotName: '$(SlotName)'
-                RuntimeStack: 'NODE|10-lts'
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Azure App Service Deploy:  new version'
+          inputs:
+              azureSubscription: 'Microsoft Partner Network (16ba3077-7489-4b0f-a4d4-82093fb7c814)'
+              appType: webAppLinux
+              WebAppName: 'hieunv-calc'
+              deployToSlotOrASE: true
+              ResourceGroupName: 'hieunv-webapp'
+              SlotName: '$(SlotName)'
+              RuntimeStack: 'NODE|10-lts'
       - job: waitForValidation
+        pool: server  
         displayName: 'Wait for external validation'
         timeoutInMinutes: 4320 # job times out in 3 days
         steps:
