@@ -54,7 +54,7 @@ stages:
             appName: $(prodApp)
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
-            package: $(Build.ArtifactStagingDirectory)/drop/$(Build.BuildId).zip
+            package: $(System.DefaultWorkingDirectory)/**/*.zip
             slotName: $(SlotName)
 
       - job: waitForValidation
