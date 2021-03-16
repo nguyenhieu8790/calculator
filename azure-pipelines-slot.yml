@@ -54,10 +54,11 @@ stages:
             appName: $(prodApp)
             runtimeStack: 'NODE|10.1'
             startUpCommand: 'npm run start'
-            package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+            package: $(Build.ArtifactStagingDirectory)/drop/$(Build.BuildId).zip
             slotName: $(SlotName)
 
       - job: waitForValidation
+        dependsOn: 'deploy_slot'
         pool: server
         displayName: 'Approve to swap'
         timeoutInMinutes: 4320 # job times out in 3 days
@@ -72,13 +73,14 @@ stages:
             onTimeout: 'resume'
 
       - job: 'swap_to_new_slot'
+        dependsOn: 'waitForValidation'
         displayName: 'Swap to new slot'
         pool:
           vmImage: 'Ubuntu-16.04'
         steps:
           - task: AzureAppServiceManage@0
             inputs:
-              azureSubscription: 'Microsoft Partner Network (16ba3077-7489-4b0f-a4d4-82093fb7c814)'
+              azureSubscription: $(prodConnection)
               action: 'Swap Slots'
               webAppName: 'hieunv-calc'
               sourceSlot: $(SlotName)
